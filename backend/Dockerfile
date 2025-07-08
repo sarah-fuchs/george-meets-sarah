@@ -1,14 +1,17 @@
-# Use a base image with Java
-FROM eclipse-temurin:17-jdk
+# Use Java 21 base image
+FROM eclipse-temurin:21-jdk
 
 # Set working directory
 WORKDIR /app
 
-# Copy the Maven wrapper and project files
+# Copy everything
 COPY . .
 
-# Build the application
+# Fix Maven permission issue
+RUN chmod +x mvnw
+
+# Build the Spring Boot app
 RUN ./mvnw clean package -DskipTests
 
-# Run the app
+# Run the final JAR
 CMD ["java", "-jar", "target/*.jar"]
