@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>George meets Sarah</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+        }
+
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+            white-space: pre-wrap;
+        }
+
+        .george {
+            color: #2870ED;
+        }
+
+        .sarah {
+            color: #00ff00;
+        }
+
+        .line {
+            display: block;
+        }
+
+        .input-line::before {
+            content: "> ";
+        }
+
+        input {
+            background: none;
+            border: none;
+            color: #00ff00;
+            font: inherit;
+            outline: none;
+            width: 100%;
+        }
+
+        .blinking-cursor::after {
+            content: "_";
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="terminal">
+        <div class="line">Welcome to george-meets-sarah.dev</div>
+        <div class="line">Type 'help' to see what you can ask George.</div>
+    </div>
+    <div class="line input-line blinking-cursor">
+        <input type="text" id="commandInput" autofocus autocomplete="off" />
+    </div>
+    <script>
+        const terminal = document.getElementById('terminal');
+        const input = document.getElementById('commandInput');
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        const appendLine = (text, isUser = false) => {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.classList.add(isUser ? 'sarah' : 'george');
+            line.textContent = (isUser ? '> ' : '') + text;
+            terminal.appendChild(line);
+            window.scrollTo(0, document.body.scrollHeight);
+        };
+
+        const runCommand = async (command) => {
+            appendLine(command, true);
+
+            if (command === 'sudo apply') {
+                typeGeorgeResponse("Permission granted. Welcome to the team, Sarah.");
+                return;
+            }
+
+            if (command === 'hello') {
+                const res = await fetch('http://localhost:8080/api/hello');
+                const data = await res.json();
+                typeGeorgeResponse(data.response);
+
+            } else if (command === 'about') {
+                const res = await fetch('http://localhost:8080/api/about-george');
+                const data = await res.json();
+                typeGeorgeResponse(data.response);
+
+            } else if (command.startsWith('ask ')) {
+                const question = command.slice(4);
+                const res = await fetch('http://localhost:8080/api/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+                const data = await res.json();
+                typeGeorgeResponse(data.response);
+
+            } else if (command.startsWith('feedback ')) {
+                const idea = command.slice(9);
+                const res = await fetch('http://localhost:8080/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea })
+                });
+                const data = await res.json();
+                typeGeorgeResponse(data.response);
+
+            } else if (command.startsWith('idea ')) {
+                const idea = command.slice(5);
+                const res = await fetch('http://localhost:8080/api/idea', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea })
+                });
+                const data = await res.json();
+                typeGeorgeResponse(data.response);
+
+            } else if (command === 'help') {
+                appendLine(`\
+Available commands:
+  hello             George greets you
+  about             Learn more about this app
+  ask <question>    Ask George anything
+                   (e.g. ask Do you believe in love at first query?)
+  feedback <msg>    Send George your feedback
+  idea <pitch>      Suggest a collaboration idea
+  clear             Clear the terminal
+  sudo apply        Try it`);
+
+
+            } else if (command === 'clear') {
+                terminal.innerHTML = '';
+            } else {
+                appendLine("Unknown command. Try 'help'");
+            }
+        };
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'ArrowUp') {
+                if (commandHistory.length > 0 && historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    input.value = '';
+                }
+            } else if (e.key === 'Enter') {
+                const command = input.value.trim();
+                if (command !== '') {
+                    commandHistory.push(command);
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                    await runCommand(command);
+                }
+            }
+
+        });
+
+        const typeGeorgeResponse = (text) => {
+            const line = document.createElement('div');
+            line.className = 'line george';
+            terminal.appendChild(line);
+
+            let index = 0;
+            const speed = 20; // typing speed (ms)
+
+            const type = () => {
+                if (index < text.length) {
+                    line.textContent += text.charAt(index);
+                    index++;
+                    setTimeout(type, speed);
+                } else {
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            };
+
+            type();
+        };
+        runBootCommands();
+    </script>
+</body>
+
+</html>
