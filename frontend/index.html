@@ -90,18 +90,18 @@
             }
 
             if (command === 'hello') {
-                const res = await fetch('http://localhost:8080/api/hello');
+                const res = await fetch('https://george-meets-sarah-production.up.railway.app/api/hello');
                 const data = await res.json();
                 typeGeorgeResponse(data.response);
 
             } else if (command === 'about') {
-                const res = await fetch('http://localhost:8080/api/about-george');
+                const res = await fetch('https://george-meets-sarah-production.up.railway.app/api/about-george');
                 const data = await res.json();
                 typeGeorgeResponse(data.response);
 
             } else if (command.startsWith('ask ')) {
                 const question = command.slice(4);
-                const res = await fetch('http://localhost:8080/api/ask', {
+                const res = await fetch('https://george-meets-sarah-production.up.railway.app/api/ask', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question })
@@ -111,7 +111,7 @@
 
             } else if (command.startsWith('feedback ')) {
                 const idea = command.slice(9);
-                const res = await fetch('http://localhost:8080/api/feedback', {
+                const res = await fetch('https://george-meets-sarah-production.up.railway.app/api/feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idea })
@@ -121,7 +121,7 @@
 
             } else if (command.startsWith('idea ')) {
                 const idea = command.slice(5);
-                const res = await fetch('http://localhost:8080/api/idea', {
+                const res = await fetch('https://george-meets-sarah-production.up.railway.app/api/idea', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idea })
