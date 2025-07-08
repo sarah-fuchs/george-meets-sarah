@@ -11,7 +11,7 @@ public class ConversationController {
 
     @GetMapping("/hello")
     public Map<String, String> hello() {
-        return Map.of("response", "Hello Sarah, I'm George. Your digital buddy. 👋");
+        return Map.of("response", "Hello, I'm George. Your digital friend. 👋");
     }
 
     @GetMapping("/about-george")
